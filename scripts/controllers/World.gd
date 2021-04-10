@@ -23,6 +23,7 @@ var bob_amplitude = 0.01
 
 
 func _ready():
+	# Setup gubbins
 	HiScore.text = str(load_score())
 	
 	# Set the wallpaper motion
@@ -33,9 +34,12 @@ func _ready():
 	WallSpawnTimer.wait_time = wall_spawn_time
 	WallSpawnTimer.start()
 	
+	# Give all the players an ID
 	Net.set_ids()
-	$Player.initialise(Net.net_id)
+	# and create a player sprite for each.
 	create_players()
+	# Then, create my own lil guy
+	$Player.initialise(Net.net_id)
 
 func create_players():
 	for id in Net.peer_ids:
@@ -47,6 +51,7 @@ func create_player(id):
 	p.initialise(id)
 
 func reset_game():
+	# This works well enough for one player, but we actually want a less nuclear approach
 	var _ok = get_tree().reload_current_scene()
 
 
@@ -64,18 +69,15 @@ func _on_WallSpawner_timeout():
 
 
 #### Player helper functions
-func _on_Player_ready(player):
-	# Called when a player spawns
-	player.high_score = load_score()
-
 func _on_Player_death(player):
-	print("Player died!")
+	# See if we have a new PB
 	if player.score > int(HiScore.text):
 		save_score(player.score)
 		HiScore.text = str(player.score)
+	
+	# Tell the engine it can lose the player
 	player.queue_free()
-	# This works well enough for one player, but we actually want a less nuclear approach
-	# var _ok = get_tree().reload_current_scene()
+	
 	reset_game()
 
 func _on_Player_score_point(player):
@@ -91,7 +93,6 @@ func increase_difficulty():
 	# Background.material.set_shader_param('scroll_speed', wall_speed*parallax)
 	for wall in get_tree().get_nodes_in_group("walls"):
 		wall.speed = wall_speed
-	print("Increasing difficulty: wall_speed = ", wall_speed)
 
 func load_score():
 	var high_score = 0
@@ -104,9 +105,6 @@ func load_score():
 	while saved.get_position() < saved.get_len():
 		var data = parse_json(saved.get_line())
 		high_score = int(data['highscore'])
-		print("Loaded in save data")
-		print(data)
-		print(high_score)
 	saved.close()
 	
 	return high_score
@@ -114,7 +112,8 @@ func load_score():
 func save_score(score):
 	var saved = File.new()
 	saved.open(high_score_fname, File.WRITE)
+	
+	# We will store as a JSON object. Overkill for a single integer, but should 
+	# be easy to scale out.
 	var score_dict = {"highscore": score}
 	saved.store_line(to_json(score_dict))
-	print("Saved score %d" % score)
-
