@@ -26,8 +26,8 @@ func initialise(id):
 
 
 func _ready():
-	emit_signal("ready", self)
 	add_to_group("players")
+	emit_signal("ready", self)
 
 
 func _physics_process(_delta):
@@ -74,6 +74,10 @@ remote func update_position(pos):
 	position = pos
 
 
+func _on_Detect_body_entered(_body):
+	death()
+
+
 func _on_Detect_area_entered(_area):
 	# Detects entering the score zone. Signals to the world to update other nodes.
 	score += 1
@@ -82,14 +86,11 @@ func _on_Detect_area_entered(_area):
 	emit_signal("score_point", self)
 
 func death():
-	is_alive = false
-	$DeathSound.play()
-	emit_signal("death", self)
-
-
-func _on_Detect_body_entered(_body):
-	death()
+	if is_alive:
+		is_alive = false
+		$DeathSound.play()
 
 
 func _on_DeathSound_finished():
 	print("Deathsound finished")
+	emit_signal("death", self)
