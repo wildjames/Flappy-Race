@@ -34,7 +34,7 @@ func _physics_process(_delta):
 	if not is_alive:
 		motion.x = 0
 		motion.y = 0
-		var collision = move_and_collide(motion)
+		var collision_info = move_and_slide(motion, UP)
 
 	elif is_master:
 		motion.y += GRAVITY
@@ -48,9 +48,8 @@ func _physics_process(_delta):
 			else:
 				play_flap_sound()
 
-
 		motion.x = 0
-		motion = move_and_slide(motion, UP)
+		var collision_info = move_and_slide(motion, UP)
 
 		if Net.is_online:
 			rpc_unreliable("update_position", position)
