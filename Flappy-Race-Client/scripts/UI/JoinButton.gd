@@ -14,6 +14,6 @@ func _on_Join_pressed():
 func join():
 	var join_ip = $JoinIP.text
 	# Ask the netcode to start up the client
-	Net.initialise_client(join_ip)
+	Server.initialise_client(join_ip)
 	# and display the waiting screen
 	emit_signal("show_connect_screen", 1)

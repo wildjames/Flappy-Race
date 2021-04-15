@@ -28,7 +28,7 @@ config/icon="res://icon.png"
 [autoload]
 
 Globals="*res://scripts/Globals.gd"
-Net="*res://scripts/Netcode/network.gd"
+Server="*res://scripts/Netcode/Server.gd"
 
 [display]
 

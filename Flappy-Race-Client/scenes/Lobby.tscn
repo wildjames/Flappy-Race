@@ -1,6 +1,5 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=6 format=2]
 
-[ext_resource path="res://scripts/UI/HostButton.gd" type="Script" id=1]
 [ext_resource path="res://scripts/UI/JoinButton.gd" type="Script" id=2]
 [ext_resource path="res://scripts/UI/Connecting.gd" type="Script" id=3]
 [ext_resource path="res://scripts/controllers/Lobby.gd" type="Script" id=4]
@@ -21,30 +20,6 @@ anchor_bottom = 1.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 color = Color( 0.25098, 0, 0.380392, 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Host" type="Button" parent="."]
-margin_left = 621.0
-margin_top = 157.066
-margin_right = 813.0
-margin_bottom = 245.066
-hint_tooltip = "Start hosting a server"
-text = "Host"
-script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="MyIP" type="Label" parent="Host"]
-margin_left = -8.0
-margin_top = 104.0
-margin_right = 184.0
-margin_bottom = 128.0
-text = "Your IP: 127.0.0.1"
-align = 1
-valign = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -141,8 +116,6 @@ align = 1
 [node name="BGMusic" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 6 )
 autoplay = true
-[connection signal="pressed" from="Host" to="Host" method="on_Host_pressed"]
-[connection signal="show_connect_screen" from="Host" to="Connecting" method="show_connect_screen"]
 [connection signal="pressed" from="Join" to="Join" method="_on_Join_pressed"]
 [connection signal="show_connect_screen" from="Join" to="Connecting" method="show_connect_screen"]
 [connection signal="pressed" from="Solo" to="Solo" method="_on_Solo_pressed"]

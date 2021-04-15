@@ -10,7 +10,7 @@ func show_connect_screen(conn_type):
 
 	if conn_type == ConnTypes.HOST:
 		$ConnectingText.text = "Waiting for players..."
-		$NumPlayers.text = "Players: [%d/%d]" % [Net.current_players, Net.MAX_PLAYERS]
+		$NumPlayers.text = "Players: [%d/%d]" % [Server.current_players, Server.MAX_PLAYERS]
 		$MyIP.show()
 		$Start.show()
 		$NumPlayers.show()

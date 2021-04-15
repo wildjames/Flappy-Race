@@ -1,51 +1,42 @@
 extends Node
 
 const RPC_PORT = 31400
-const MAX_PLAYERS = 4
+const MAX_PLAYERS = 8
 
 signal public_ip_changed(new_ip)
 
-var net_id = null
+# TODO: Remove all references to this
 var is_host = false
-var peer_ids = []
-var current_players = 1
-var host_player
+
+
+var net_id = null
 var is_online = true
+var current_players = 1
 var public_ip = "127.0.0.1"
 
 
 func _ready():
 	update_public_ip()
 
-func initialise_server():
-	is_host = true
-
-	# This starts the actual server to communicate with clients
-	var peer = NetworkedMultiplayerENet.new()
-	peer.create_server(RPC_PORT, MAX_PLAYERS)
-	get_tree().network_peer = peer
-
-	is_online = true
-
 
 func initialise_client(server_ip):
-	is_host = false
-
 	# Start a client for communicating with the server, and connect to that server
 	var peer = NetworkedMultiplayerENet.new()
 	peer.create_client(server_ip, RPC_PORT)
-	get_tree().network_peer = peer
+	get_tree().set_network_peer(peer)
+
+	peer.connect("connection_failed", self, "_on_connection_failed")
+	peer.connect("connection_succeeded", self, "_on_connection_succeeded")
 
 	is_online = true
 
 
-func set_ids():
-	if is_online:
-		net_id = get_tree().get_network_unique_id()
-		peer_ids = get_tree().get_network_connected_peers()
-	else:
-		net_id = 0
-		peer_ids = []
+func _on_connection_failed():
+	print("Connection failed!")
+
+
+func _on_connection_succeeded():
+	print("Connection succeeded!")
 
 
 func update_public_ip():
