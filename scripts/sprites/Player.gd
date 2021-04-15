@@ -1,7 +1,7 @@
 extends KinematicBody2D
 
 var is_master = false
-var is_dead = false
+var is_alive = true
 
 const UP = Vector2(0, -1)
 const FLAP = 350
@@ -31,10 +31,10 @@ func _ready():
 
 
 func _physics_process(_delta):
-	if is_dead:
+	if not is_alive:
 		motion.x = 0
 		motion.y = 0
-		motion = move_and_slide(motion, UP)
+		var collision = move_and_collide(motion)
 
 	elif is_master:
 		motion.y += GRAVITY
@@ -83,8 +83,9 @@ func _on_Detect_area_entered(_area):
 	emit_signal("score_point", self)
 
 func death():
-	is_dead = true
+	is_alive = false
 	$DeathSound.play()
+	emit_signal("death", self)
 
 
 func _on_Detect_body_entered(_body):
@@ -93,4 +94,3 @@ func _on_Detect_body_entered(_body):
 
 func _on_DeathSound_finished():
 	print("Deathsound finished")
-	emit_signal("death", self)

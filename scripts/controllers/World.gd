@@ -80,7 +80,7 @@ func get_player(id):
 	return null
 
 
-func reset_game():
+remotesync func reset_game():
 	# This works well enough for one player, but we actually want a less nuclear approach
 	var _ok = get_tree().reload_current_scene()
 
@@ -121,17 +121,20 @@ func _on_Player_death(player):
 		HiScore.text = str(Globals.high_score)
 
 	# Tell the engine it can lose the player
-	player.queue_free()
+	# player.queue_free()
 
 	print("There are now %d players." % len(get_tree().get_nodes_in_group("Players")))
-	print("Players are now:")
+	var num_players_alive: int = 0
 	for node in get_tree().get_nodes_in_group("Players"):
-		print(node.name)
+		num_players_alive += int(node.is_alive)
+	print("Of which %d are alive" % num_players_alive)
 
-	if Net.is_online and Net.is_host:
-		rpc("reset_game")
-	else:
-		reset_game()
+	if num_players_alive == 0:
+		print("I need to reset the game for all players.")
+		if Net.is_online and Net.is_host:
+			rpc("reset_game")
+		else:
+			reset_game()
 
 
 func _on_Player_score_point(player):
