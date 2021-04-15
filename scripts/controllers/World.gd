@@ -120,9 +120,7 @@ func _on_Player_death(player):
 		save_high_score()
 		HiScore.text = str(Globals.high_score)
 
-	# Tell the engine it can lose the player
-	# player.queue_free()
-
+	# Decide if the game must restart
 	print("There are now %d players." % len(get_tree().get_nodes_in_group("Players")))
 	var num_players_alive: int = 0
 	for node in get_tree().get_nodes_in_group("Players"):

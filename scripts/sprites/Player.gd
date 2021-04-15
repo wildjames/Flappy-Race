@@ -84,9 +84,12 @@ func _on_Detect_area_entered(_area):
 
 func death():
 	if is_alive:
+		# That's all she wrote
 		is_alive = false
+		# Make the sprite transparent
 		modulate = Color8(255,255,255,100)
 		$DeathSound.play()
+		emit_signal("death", self)
 
 
 func _on_Detect_body_entered(_body):
@@ -94,5 +97,4 @@ func _on_Detect_body_entered(_body):
 
 
 func _on_DeathSound_finished():
-	print("Deathsound finished")
 	emit_signal("death", self)
