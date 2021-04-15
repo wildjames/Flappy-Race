@@ -32,8 +32,9 @@ func _ready():
 	Background.material.set_shader_param('bob_speed', bob_speed)
 	Background.material.set_shader_param('bob_amplitude', bob_amplitude)
 
-	WallSpawnTimer.wait_time = wall_spawn_time
-	WallSpawnTimer.start()
+	if (not Net.is_online) or (Net.is_host):
+		WallSpawnTimer.wait_time = wall_spawn_time
+		WallSpawnTimer.start()
 
 	# Connect the player connection signals
 	var _result
@@ -87,7 +88,13 @@ remotesync func reset_game():
 
 
 #### Wall functions
-remotesync func create_wall():
+func _on_WallSpawner_timeout():
+	WallSpawnTimer.wait_time = wall_spawn_time * float(start_wall_speed) / wall_speed
+	rpc("increase_difficulty")
+	create_wall()
+
+
+func create_wall():
 	var inst = Wall.instance()
 	# Use the game RNG to keep the levels deterministic
 	var height = Globals.game_rng.randf_range(-height_range, height_range)
@@ -97,19 +104,26 @@ remotesync func create_wall():
 	inst.gap = gap
 	inst.speed = wall_speed
 
+	call_deferred("add_child", inst)
+
 	if Net.is_online and Net.is_host:
-		rpc("spawn_wall", inst)
-	else:
-		spawn_wall(inst)
+		rpc("spawn_wall", inst.position, inst.gap, inst.speed)
 
 
-remotesync func spawn_wall(inst):
+remote func spawn_wall(pos, gap, speed):
+	var inst = Wall.instance()
+	inst.position = pos
+	inst.gap = gap
+	inst.speed = speed
+
 	call_deferred("add_child", inst)
 
 
-func _on_WallSpawner_timeout():
-	WallSpawnTimer.wait_time = wall_spawn_time * float(start_wall_speed) / wall_speed
-	create_wall()
+remotesync func increase_difficulty():
+	print("Speed up")
+	wall_speed += speed_up
+	for wall in get_tree().get_nodes_in_group("walls"):
+		wall.speed = wall_speed
 
 
 #### Player helper functions
@@ -121,11 +135,17 @@ func _on_Player_death(player):
 		save_high_score()
 		HiScore.text = str(Globals.high_score)
 
-	if not Net.is_host:
+	# If I'm not the host, inform the host I've died
+	if Net.is_online and not Net.is_host:
 		rpc_id(0, "player_died", player.name)
 
-	if (Net.is_online and Net.is_host) or (not Net.is_online):
+	# If I'm not online, restart the game
+	if not Net.is_online:
+		reset_game()
+	# If I am the host, check if all players are dead
+	elif Net.is_host:
 		are_all_players_dead()
+	# And if I'm not the host, tell the host to check.
 	else:
 		rpc_id(0, "are_all_players_dead")
 
@@ -137,19 +157,15 @@ remote func player_died(id):
 
 
 remote func are_all_players_dead():
+	# Function should only be entered if the player is online
 	# Decide if the game must restart
-	print("There are now %d players." % len(get_tree().get_nodes_in_group("Players")))
 	var num_players_alive: int = 0
+
 	for node in get_tree().get_nodes_in_group("Players"):
-		print("ID: %s" % node.name)
-		print("Is alive?" + str(node.is_alive))
-		print()
 		num_players_alive += int(node.is_alive)
-	print("Of which %d are alive" % num_players_alive)
 
 	if num_players_alive == 0:
-		print("I need to reset the game for all players.")
-		if Net.is_online and Net.is_host:
+		if Net.is_host:
 			rpc("reset_game")
 		else:
 			reset_game()
@@ -157,20 +173,10 @@ remote func are_all_players_dead():
 
 func _on_Player_score_point(player):
 	# Actual incrimenting is handled on the player object
-	increase_difficulty()
 	Score.text = str(player.score)
 
 
 #### World functions
-func increase_difficulty():
-	wall_speed += speed_up
-	# Speed up the background
-	# TODO: this causes jerky stutter. Needs fixing.
-	# Background.material.set_shader_param('scroll_speed', wall_speed*parallax)
-	for wall in get_tree().get_nodes_in_group("walls"):
-		wall.speed = wall_speed
-
-
 func load_high_score():
 	var save_file = File.new()
 	if not save_file.file_exists(high_score_fname):
