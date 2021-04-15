@@ -81,6 +81,7 @@ func get_player(id):
 
 
 remotesync func reset_game():
+	print("RESETTING GAME\n\n")
 	# This works well enough for one player, but we actually want a less nuclear approach
 	var _ok = get_tree().reload_current_scene()
 
@@ -91,7 +92,7 @@ remotesync func create_wall():
 	# Use the game RNG to keep the levels deterministic
 	var height = Globals.game_rng.randf_range(-height_range, height_range)
 	var gap = Globals.game_rng.randf_range(gap_range_min, gap_range_max)
-	print("Spawning wall - height: ", height, " - gap: ", gap)
+	#print("Spawning wall - height: ", height, " - gap: ", gap)
 	inst.position = Vector2(get_viewport().size.x / 2 + 64, height)
 	inst.gap = gap
 	inst.speed = wall_speed
@@ -120,6 +121,22 @@ func _on_Player_death(player):
 		save_high_score()
 		HiScore.text = str(Globals.high_score)
 
+	if not Net.is_host:
+		rpc_id(0, "player_died", player.name)
+
+	if (Net.is_online and Net.is_host) or (not Net.is_online):
+		are_all_players_dead()
+	else:
+		rpc_id(0, "are_all_players_dead")
+
+
+remote func player_died(id):
+	for node in get_tree().get_nodes_in_group("Players"):
+		if node.name == id:
+			node.is_alive = false
+
+
+remote func are_all_players_dead():
 	# Decide if the game must restart
 	print("There are now %d players." % len(get_tree().get_nodes_in_group("Players")))
 	var num_players_alive: int = 0
