@@ -48,7 +48,6 @@ func _physics_process(_delta):
 			else:
 				play_flap_sound()
 
-
 		motion.x = 0
 		motion = move_and_slide(motion, UP)
 
@@ -76,11 +75,12 @@ remote func update_position(pos):
 
 
 func _on_Detect_area_entered(_area):
-	# Detects entering the score zone. Signals to the world to update other nodes.
-	score += 1
-	if score > high_score:
-		high_score = score
-	emit_signal("score_point", self)
+	if is_alive:
+		# Detects entering the score zone. Signals to the world to update other nodes.
+		score += 1
+		if score > high_score:
+			high_score = score
+		emit_signal("score_point", self)
 
 func death():
 	if is_alive:
@@ -97,4 +97,4 @@ func _on_Detect_body_entered(_body):
 
 
 func _on_DeathSound_finished():
-	emit_signal("death", self)
+	pass

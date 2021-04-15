@@ -124,6 +124,9 @@ func _on_Player_death(player):
 	print("There are now %d players." % len(get_tree().get_nodes_in_group("Players")))
 	var num_players_alive: int = 0
 	for node in get_tree().get_nodes_in_group("Players"):
+		print("ID: %s" % node.name)
+		print("Is alive?" + str(node.is_alive))
+		print()
 		num_players_alive += int(node.is_alive)
 	print("Of which %d are alive" % num_players_alive)
 
