@@ -1,19 +1,15 @@
 extends ColorRect
 
-enum ConnTypes {HOST=0, CLIENT=1}
 
 # This function is called when the join or host buttons are pushed.
 # It should ONLY handle changing the screen for the user.
-func show_connect_screen(conn_type):
+func show_connect_screen():
 	# Reveal thyself
 	show()
 
-	if conn_type == ConnTypes.HOST:
-		$ConnectingText.text = "Waiting for players..."
-		$NumPlayers.text = "Players: [%d/%d]" % [Server.current_players, Server.MAX_PLAYERS]
-		$MyIP.show()
-		$Start.show()
-		$NumPlayers.show()
+	$ConnectingText.text = "...Connecting to server..."
 
-	elif conn_type == ConnTypes.CLIENT:
-		$ConnectingText.text = "...Connecting to server..."
+remote func update_connect_screen(num_players):
+	Server.current_players = num_players
+	$ConnectingText.text = "Waiting for players..."
+	$NumPlayers.text = "Players: [%d/%d]" % [Server.current_players, Server.MAX_PLAYERS]

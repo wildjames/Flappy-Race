@@ -1,6 +1,6 @@
 extends Node
 
-const RPC_PORT = 31400
+const RPC_PORT = 1909
 const MAX_PLAYERS = 8
 
 signal public_ip_changed(new_ip)
@@ -11,7 +11,7 @@ var is_host = false
 
 var net_id = null
 var is_online = true
-var current_players = 1
+var current_players = 0
 var public_ip = "127.0.0.1"
 
 

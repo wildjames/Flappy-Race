@@ -98,6 +98,5 @@ margin_bottom = 720.0
 
 [node name="BGMusic" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 8 )
-autoplay = true
 [connection signal="fade_finished" from="FadeIn" to="." method="_on_FadeIn_fade_finished"]
 [connection signal="finished" from="BGMusic" to="." method="_on_BGMusic_finished"]
