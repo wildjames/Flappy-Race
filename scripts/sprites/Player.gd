@@ -26,15 +26,15 @@ func initialise(id):
 
 
 func _ready():
-	add_to_group("players")
 	emit_signal("ready", self)
+	add_to_group("players")
 
 
 func _physics_process(_delta):
 	if not is_alive:
 		motion.x = 0
 		motion.y = 0
-		var collision_info = move_and_slide(motion, UP)
+		#motion = move_and_slide(motion, UP)
 
 	elif is_master:
 		motion.y += GRAVITY
@@ -48,8 +48,9 @@ func _physics_process(_delta):
 			else:
 				play_flap_sound()
 
+
 		motion.x = 0
-		var collision_info = move_and_slide(motion, UP)
+		motion = move_and_slide(motion, UP)
 
 		if Net.is_online:
 			rpc_unreliable("update_position", position)
@@ -74,10 +75,6 @@ remote func update_position(pos):
 	position = pos
 
 
-func _on_Detect_body_entered(_body):
-	death()
-
-
 func _on_Detect_area_entered(_area):
 	# Detects entering the score zone. Signals to the world to update other nodes.
 	score += 1
@@ -88,7 +85,12 @@ func _on_Detect_area_entered(_area):
 func death():
 	if is_alive:
 		is_alive = false
+		modulate = Color8(255,255,255,100)
 		$DeathSound.play()
+
+
+func _on_Detect_body_entered(_body):
+	death()
 
 
 func _on_DeathSound_finished():
