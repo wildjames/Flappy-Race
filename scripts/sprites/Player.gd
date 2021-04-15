@@ -24,6 +24,7 @@ func initialise(id):
 
 func _ready():
 	emit_signal("ready", self)
+	add_to_group("players")
 
 func _physics_process(_delta):
 	if is_master:
@@ -33,6 +34,11 @@ func _physics_process(_delta):
 
 		if Input.is_action_just_pressed("ui_accept"):
 			motion.y = -FLAP
+			if Net.is_online:
+				rpc_unreliable("play_flap_sound")
+			else:
+				play_flap_sound()
+
 
 		motion.x = 0
 		motion = move_and_slide(motion, UP)

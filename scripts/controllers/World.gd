@@ -67,6 +67,7 @@ func create_players():
 
 func create_player(id):
 	var p = Player.instance()
+	p.add_to_group("Players")
 	add_child(p)
 	p.initialise(id)
 
@@ -85,7 +86,7 @@ func reset_game():
 
 
 #### Wall functions
-func spawn_wall():
+remotesync func create_wall():
 	var inst = Wall.instance()
 	# Use the game RNG to keep the levels deterministic
 	var height = Globals.game_rng.randf_range(-height_range, height_range)
@@ -94,16 +95,25 @@ func spawn_wall():
 	inst.position = Vector2(get_viewport().size.x / 2 + 64, height)
 	inst.gap = gap
 	inst.speed = wall_speed
+
+	if Net.is_online and Net.is_host:
+		rpc("spawn_wall", inst)
+	else:
+		spawn_wall(inst)
+
+
+remotesync func spawn_wall(inst):
 	call_deferred("add_child", inst)
 
 
 func _on_WallSpawner_timeout():
 	WallSpawnTimer.wait_time = wall_spawn_time * float(start_wall_speed) / wall_speed
-	spawn_wall()
+	create_wall()
 
 
 #### Player helper functions
 func _on_Player_death(player):
+	print("Player %s died" % player.name)
 	# See if we have a new PB
 	if player.score > Globals.high_score:
 		Globals.high_score = player.score
@@ -113,7 +123,15 @@ func _on_Player_death(player):
 	# Tell the engine it can lose the player
 	player.queue_free()
 
-	reset_game()
+	print("There are now %d players." % len(get_tree().get_nodes_in_group("Players")))
+	print("Players are now:")
+	for node in get_tree().get_nodes_in_group("Players"):
+		print(node.name)
+
+	if Net.is_online and Net.is_host:
+		rpc("reset_game")
+	else:
+		reset_game()
 
 
 func _on_Player_score_point(player):
@@ -156,3 +174,7 @@ func save_high_score():
 
 	save_file.store_line(to_json(store_dict))
 	save_file.close()
+
+
+func _on_BGMusic_finished():
+	$BGMusic.play()
