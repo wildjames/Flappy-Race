@@ -11,5 +11,5 @@ dest_files=[ "res://.import/mouthsounds.ogg-9c4ce1a09be64675f8c5296854d498df.ogg
 
 [params]
 
-loop=true
+loop=false
 loop_offset=0

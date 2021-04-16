@@ -90,7 +90,10 @@ remotesync func reset_game():
 #### Wall functions
 func _on_WallSpawner_timeout():
 	WallSpawnTimer.wait_time = wall_spawn_time * float(start_wall_speed) / wall_speed
-	rpc("increase_difficulty")
+	if Net.is_online and Net.is_host:
+		rpc("increase_difficulty")
+	else:
+		increase_difficulty()
 	create_wall()
 
 

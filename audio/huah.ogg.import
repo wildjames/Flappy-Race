@@ -11,5 +11,5 @@ dest_files=[ "res://.import/huah.ogg-db98510994d7eb716493f0c9fafc1dcb.oggstr" ]
 
 [params]
 
-loop=true
+loop=false
 loop_offset=0
