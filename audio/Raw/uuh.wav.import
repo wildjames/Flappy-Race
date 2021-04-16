@@ -2,12 +2,12 @@
 
 importer="wav"
 type="AudioStreamSample"
-path="res://.import/huah.wav-7ccf698855f84c9746b272c831cd69ba.sample"
+path="res://.import/uuh.wav-de1cfeef5923c2deec5a82bea848ce89.sample"
 
 [deps]
 
-source_file="res://audio/huah.wav"
-dest_files=[ "res://.import/huah.wav-7ccf698855f84c9746b272c831cd69ba.sample" ]
+source_file="res://audio/Raw/uuh.wav"
+dest_files=[ "res://.import/uuh.wav-de1cfeef5923c2deec5a82bea848ce89.sample" ]
 
 [params]
 

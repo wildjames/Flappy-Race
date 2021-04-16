@@ -2,12 +2,12 @@
 
 importer="wav"
 type="AudioStreamSample"
-path="res://.import/ahuah.wav-55f18e07f31a51bf07e4c8391a5abe75.sample"
+path="res://.import/background.wav-348d393985be53c7ab80bc97e5343cd4.sample"
 
 [deps]
 
-source_file="res://audio/ahuah.wav"
-dest_files=[ "res://.import/ahuah.wav-55f18e07f31a51bf07e4c8391a5abe75.sample" ]
+source_file="res://audio/Raw/background.wav"
+dest_files=[ "res://.import/background.wav-348d393985be53c7ab80bc97e5343cd4.sample" ]
 
 [params]
 
