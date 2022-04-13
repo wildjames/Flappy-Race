@@ -1,39 +1,52 @@
-        
+
 name: Build Game
 
 on:
-  push: {}
-  pull_request: {}
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+     - main
+  workflow_call:
+    inputs:
+      commit_hash:
+        required: false
+        description: Optional commit hash to build
+        type: string
+        default: ${{ github.sha }}
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  # Remember to also update the container image version below
+  GODOT_VERSION: 3.4
+
 jobs:
-  Godot:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         platform: [linux, windows, mac]
-        include:
-          - platform: linux
-            file: x86_64
-          - platform: windows
-            file: exe
-          - platform: mac
-            file: zip
+    container:
+      image: barichello/godot-ci:3.4
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
+          ref: ${{ inputs.commit_hash }}
           lfs: true
+      - name: Setup
+        run: |
+          mkdir -v -p ~/.local/share/godot/templates
+          mv /root/.local/share/godot/templates/${GODOT_VERSION}.stable ~/.local/share/godot/templates/${GODOT_VERSION}.stable
       - name: Build
-        id: build
-        uses: josephbmanley/build-godot-action@v1.4.1
-        with:
-          name: FlappyRace.${{ matrix.file }}
-          preset: ${{ matrix.platform }}
-          debugMode: "true"
+        run: |
+          mkdir -v -p builds/${{ matrix.platform }}
+          godot -v --export-debug ${{ matrix.platform }}
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v1
         with:
-          name: Client - ${{ matrix.platform }}
-          path: ${{ github.workspace }}/${{ steps.build.outputs.build }}
+          name: FlappyRace-${{ matrix.platform }}-${{ inputs.commit_hash || github.sha }}
+          path: builds/${{ matrix.platform }}
